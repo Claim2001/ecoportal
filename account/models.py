@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -8,6 +7,12 @@ from django.contrib.auth.models import User
 GENDERS = (
     ('woman', _('Woman')),
     ('man', _('Man')),
+)
+
+ROLES = (
+    ("1", _("Eco Activist")),
+    ("2", _("Guide")),
+    ("3", _("Partner")),
 )
 
 
@@ -27,7 +32,8 @@ class ProfileModel(BaseModel, models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     dob = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=10, null=True, blank=True, choices=GENDERS)
-    avatar = models.ImageField(upload_to='profiles', blank=True, null=True)
+    avatar = models.ImageField(upload_to='profiles')
+    role = models.CharField(max_length=20, choices=ROLES)
 
     def __str__(self):
         return self.user.username + ' | ' + self.user.get_full_name()

@@ -1,9 +1,14 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
-from rest_framework.exceptions import ParseError
+from .models import ProfileModel
 
-from .models import TokenModel, ProfileModel
-from .utils import pass_generator
+
+class SMSSerializer(serializers.Serializer):
+    phone = serializers.CharField(required=True)
+
+
+class CodeConfirmSerializer(serializers.Serializer):
+    code = serializers.CharField(required=True)
+    phone = serializers.CharField(required=True)
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -11,11 +16,9 @@ class RegistrationSerializer(serializers.ModelSerializer):
     code = serializers.CharField(max_length=5, required=True)
     first_name = serializers.CharField(required=True)
     last_name = serializers.CharField(required=True)
-
-    def create(self, validated_data):
-
-        return super(RegistrationSerializer, self).create(validated_data)
+    avatar = serializers.ImageField(required=True)
+    role = serializers.IntegerField(max_value=3, min_value=1, required=True)
 
     class Meta:
         model = ProfileModel
-        fields = ['dob', 'gender', 'avatar', 'phone', 'first_name', 'last_name', 'code']
+        fields = ['dob', 'gender', 'avatar', 'phone', 'first_name', 'last_name', 'code', 'role']

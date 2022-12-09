@@ -18,3 +18,11 @@ class BaseModel(models.Model):
             BrinIndex(fields=('created_at', 'updated_at')),
         )
         abstract = True
+
+
+class LocationModel(models.Model):
+    lat = models.FloatField()
+    long = models.FloatField()
+
+    class Meta:
+        abstract = True
