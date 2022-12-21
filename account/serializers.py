@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ProfileModel
+from .models import ProfileModel, ROLES
 
 
 class SMSSerializer(serializers.Serializer):
@@ -17,8 +17,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(required=True)
     last_name = serializers.CharField(required=True)
     avatar = serializers.ImageField(required=True)
-    role = serializers.IntegerField(max_value=3, min_value=1, required=True)
+    role = serializers.ChoiceField(choices=ROLES, required=True)
 
     class Meta:
         model = ProfileModel
-        fields = ['dob', 'gender', 'avatar', 'phone', 'first_name', 'last_name', 'code', 'role']
+        fields = ['avatar', 'phone', 'first_name', 'last_name', 'code', 'role']

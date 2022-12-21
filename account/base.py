@@ -23,6 +23,7 @@ class BaseModel(models.Model):
 class LocationModel(models.Model):
     lat = models.FloatField()
     long = models.FloatField()
+    geocode = models.TextField()
 
     class Meta:
         abstract = True

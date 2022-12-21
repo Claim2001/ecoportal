@@ -5,7 +5,8 @@ from account.models import TokenModel, ProfileModel
 
 @admin.register(TokenModel)
 class TokenAdmin(admin.ModelAdmin):
-    list_display = ['code', ]
+    list_display = ['code', 'phone']
+    ordering = ['-created_at']
 
 
 @admin.register(ProfileModel)

@@ -1,6 +1,8 @@
 import secrets
 import string
 
+from rest_framework_simplejwt.tokens import RefreshToken
+
 
 def pass_generator():
     # define the alphabet
@@ -28,3 +30,12 @@ def pass_generator():
                 sum(char in digits for char in pwd) >= 2):
             break
     return pwd
+
+
+def get_tokens_for_user(user):
+    refresh = RefreshToken.for_user(user)
+
+    return {
+        "refresh": str(refresh),
+        "access": str(refresh.access_token)
+    }

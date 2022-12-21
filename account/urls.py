@@ -1,12 +1,11 @@
 from django.urls import path
-from knox import views as knox_views
+from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
 
 from account.views import RegistrationView, CodeConfirmView, SendSMSView
 
 urlpatterns = [
     path('login/', SendSMSView.as_view(), name='login'),
-    path('confirm/', CodeConfirmView.as_view(), name='code-confirm'),
+    path('confirm/', CodeConfirmView.as_view(), name='code_confirm'),
     path('register/', RegistrationView.as_view(), name='registration'),
-    path('logout/', knox_views.LogoutView.as_view(), name='logout'),
-    path('logoutall/', knox_views.LogoutAllView.as_view(), name='logout-all'),
+    path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
