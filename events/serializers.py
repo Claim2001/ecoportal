@@ -20,7 +20,7 @@ class ViolationCreateSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         if attrs['location'].keys() != {"geocode", "long", "lat"}:
-            raise serializers.ValidationError(detail={"message":"Lat/long/geocode not in location"})
+            raise serializers.ValidationError(detail={"message": "Lat/long/geocode not in location"})
         return attrs
 
 
@@ -31,24 +31,16 @@ class ViolationImageSerializer(serializers.ModelSerializer):
 
 
 class ViolationListSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
-    author = serializers.SerializerMethodField()
+    images = ViolationImageSerializer(many=True, source='image')
+    author = AuthorSerializer()
     location = serializers.SerializerMethodField()
 
     def get_location(self, obj):
         return {"lat": obj.lat, "long": obj.long, "geocode": obj.geocode}
 
-    def get_author(self, obj):
-        return AuthorSerializer(obj.author, many=False, context=self.context).data
-
-    def get_image(self, obj):
-        return ViolationImageSerializer(
-            ViolationImageModel.objects.filter(violation=obj).order_by('-created_at').first(), many=False,
-            context=self.context).data['image']
-
     class Meta:
         model = ViolationModel
-        fields = ['id', 'image', 'author', 'location']
+        fields = ['id', 'images', 'author', 'location']
 
 
 class ViolationRetrieveSerializer(serializers.ModelSerializer):
