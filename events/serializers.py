@@ -34,30 +34,34 @@ class ViolationListSerializer(serializers.ModelSerializer):
     images = ViolationImageSerializer(many=True, source='image')
     author = AuthorSerializer()
     location = serializers.SerializerMethodField()
+    title = serializers.CharField(source='get_title_display')
 
     def get_location(self, obj):
         return {"lat": obj.lat, "long": obj.long, "geocode": obj.geocode}
 
     class Meta:
         model = ViolationModel
-        fields = ['id', 'images', 'author', 'location']
+        fields = ['id', 'title', 'author', 'images', 'location']
 
 
 class ViolationRetrieveSerializer(serializers.ModelSerializer):
     author = AuthorSerializer()
     images = ViolationImageSerializer(many=True, source='image')
+    location = serializers.SerializerMethodField()
+    title = serializers.CharField(source='get_title_display')
+    can_change = serializers.SerializerMethodField()
 
-    def to_representation(self, instance):
-        data = super(ViolationRetrieveSerializer, self).to_representation(instance)
-        data['location'] = {"lat": data.pop('lat'), "long": data.pop('long'), "geocode": data.pop('geocode')}
+    def get_can_change(self, obj):
         user = self.context['request'].user
-        data['can_change'] = True if instance.author == user or user.is_superuser else False
-        data['title'] = instance.get_title_display()
-        return data
+        can = True if (obj.author == user or user.is_superuser) else False
+        return can
+
+    def get_location(self, obj):
+        return {"lat": obj.lat, "long": obj.long, "geocode": obj.geocode}
 
     class Meta:
         model = ViolationModel
-        fields = ['id', 'title', 'author', 'lat', 'geocode', 'long', 'images']
+        fields = ['id', 'title', 'author', 'can_change', 'location', 'images']
 
 
 class ViolationUpdateDeleteSerializer(serializers.ModelSerializer):
@@ -97,13 +101,13 @@ class ViolationUpdateDeleteSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super(ViolationUpdateDeleteSerializer, self).to_representation(instance)
-        data['location'] = {"lat": data.pop('lat'), "long": data.pop('long'), "geocode": data.pop('geocode')}
+        data['location'] = {"lat": instance.lat, "long": instance.long, "geocode": instance.geocode}
         user = self.context['request'].user
         data['title'] = instance.get_title_display()
         return data
 
     class Meta:
         model = ViolationModel
-        fields = ['id', 'title', 'comment', 'author', 'lat', 'long', 'location', 'geocode', 'images', 'deleted_images',
+        fields = ['id', 'title', 'comment', 'author', 'location', 'images', 'deleted_images',
                   'new_images']
-        read_only_fields = ('id', 'author', 'lat', 'long', 'geocode', 'images')
+        read_only_fields = ('id', 'author', 'images')

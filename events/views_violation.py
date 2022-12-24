@@ -39,12 +39,22 @@ class ViolationCreateView(GenericAPIView):
 
 
 class ViolationListView(ListAPIView):
+    """
+        List of violations
+            Response: 200 - [{"id":int,"images":[{"id":int,"image":url_to_image},...], "title":string,
+            "author":{"id":int,"avatar":ulr_to_image},"location":{"lat":float,"long":float,"geocode":string},},...]
+    """
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ViolationListSerializer
     queryset = ViolationModel.objects.all()
 
 
 class ViolationRetrieveView(RetrieveAPIView):
+    """
+        Get violation detail
+            Response: 200 - {"id":int,"title":string","author":{"id":int,"avatar":url_to_image},"can_change":bool,
+            "location":{"lat":float,"long":float,"geocode":string},"images":[{"id":int,"image":url_to_image},...]}
+    """
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ViolationRetrieveSerializer
     queryset = ViolationModel.objects.all()
@@ -52,6 +62,18 @@ class ViolationRetrieveView(RetrieveAPIView):
 
 
 class ViolationUpdateDeleteView(UpdateAPIView, DestroyAPIView):
+    """
+        Update/Delete violation
+            Can be performed only by author or superuser
+            For update better use PATCH method(no need for sending all data in body, only changed one):
+                Body: {"title":int,"comment":string,"location":{"lat":float,"long":float,"geocode":string},
+                "deleted_images":[int,int,int,...],"new_images":[FILE(image type),FILE(image type),...]}
+                Titles: 1 - Illegal Dump, 2 - Deforestation, 3 - Water Pollution
+                Deleted images: list of ids of images that user have chosen to delete
+                Response: 200 - {"id":int,"title":string,"comment":string,"author":{"id":int,"avatar":ulr_to_image},
+                "images":[{"id":int,"image":url_to_image},...],"location":{"lat":float,"long":float,"geocode":string}}
+            For delete use DELETE method
+    """
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ViolationUpdateDeleteSerializer
     queryset = ViolationModel.objects.all()
