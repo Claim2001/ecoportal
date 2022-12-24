@@ -33,7 +33,8 @@ INSTALLED_APPS = [
     'drf_yasg',
     'rest_framework_simplejwt',
     'account',
-    'events'
+    'events',
+    'multiselectfield',
 ]
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.AllowAllUsersModelBackend",
@@ -120,7 +121,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Tashkent'
 
 USE_I18N = True
 

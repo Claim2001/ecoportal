@@ -1,4 +1,6 @@
 from django.db import models
+from multiselectfield import MultiSelectField
+
 from account.base import BaseModel, LocationModel
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import User
@@ -10,12 +12,22 @@ TITLES = (
 )
 
 RECYCLE_TYPES = (
-    ("1", _("Scrap metal")),
-    ("2", _("Waste paper")),
-    ("3", _("Glass")),
-    ("4", _("Mechanism")),
-    ("5", _("Furniture")),
-    ("6", _("Plastic")),
+    (1, _("Scrap metal")),
+    (2, _("Waste paper")),
+    (3, _("Glass")),
+    (4, _("Mechanism")),
+    (5, _("Furniture")),
+    (6, _("Plastic")),
+)
+
+WORKING_DAYS = (
+    (1, _("Monday")),
+    (2, _("Tuesday")),
+    (3, _("Wednesday")),
+    (4, _("Thursday")),
+    (5, _("Friday")),
+    (6, _("Saturday")),
+    (7, _("Sunday")),
 )
 
 
@@ -33,11 +45,19 @@ class ViolationImageModel(BaseModel, models.Model):
     violation = models.ForeignKey(ViolationModel, on_delete=models.CASCADE, related_name='image')
 
 
-# class RecycleModel(BaseModel, LocationModel, models.Model):
-#     title = models.CharField(max_length=255)
-#     recycle_types = models.CharField(max_length=30, choices=RECYCLE_TYPES)
-#
-#
-# class RecycleImageModel(BaseModel, models.Model):
-#     image = models.ImageField(upload_to='recycles')
-#     recycle = models.ForeignKey(RecycleModel, on_delete=models.CASCADE)
+class RecycleModel(BaseModel, LocationModel, models.Model):
+    name = models.CharField(max_length=255)
+    recycle_types = MultiSelectField(choices=RECYCLE_TYPES, max_choices=6, max_length=20)
+    working_days = MultiSelectField(choices=WORKING_DAYS, max_choices=7, max_length=20)
+    opening = models.TimeField()
+    closing = models.TimeField()
+    comment = models.TextField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name + ' - ' + self.geocode
+
+
+class RecycleImageModel(BaseModel, models.Model):
+    image = models.ImageField(upload_to='recycles')
+    recycle = models.ForeignKey(RecycleModel, on_delete=models.CASCADE, related_name='image')

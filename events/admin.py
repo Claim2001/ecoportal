@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import ViolationModel, ViolationImageModel
+from .models import ViolationModel, ViolationImageModel, RecycleModel, RecycleImageModel
 
 
 @admin.register(ViolationModel)
@@ -11,3 +11,13 @@ class ViolationAdmin(admin.ModelAdmin):
 @admin.register(ViolationImageModel)
 class ViolationImageAdmin(admin.ModelAdmin):
     list_display = ['id', 'image', 'violation']
+
+
+@admin.register(RecycleModel)
+class RecycleAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'geocode', 'lat', 'long', 'get_working_days_display']
+
+
+@admin.register(RecycleImageModel)
+class RecycleImageAdmin(admin.ModelAdmin):
+    list_display = ['id', 'image', 'recycle']

@@ -21,6 +21,12 @@ class ViolationCreateSerializer(serializers.Serializer):
     def validate(self, attrs):
         if attrs['location'].keys() != {"geocode", "long", "lat"}:
             raise serializers.ValidationError(detail={"message": "Lat/long/geocode not in location"})
+        if not isinstance(attrs['location']['lat'], (float, int)):
+            raise serializers.ValidationError(detail={"message": "Lat is not float or int"})
+        if not isinstance(attrs['location']['long'], (float, int)):
+            raise serializers.ValidationError(detail={"message": "Long is not float or int"})
+        if not isinstance(attrs['location']['geocode'], str):
+            raise serializers.ValidationError(detail={"message": "Geocode is not string"})
         return attrs
 
 
@@ -53,8 +59,7 @@ class ViolationRetrieveSerializer(serializers.ModelSerializer):
 
     def get_can_change(self, obj):
         user = self.context['request'].user
-        can = True if (obj.author == user or user.is_superuser) else False
-        return can
+        return True if (obj.author == user or user.is_superuser) else False
 
     def get_location(self, obj):
         return {"lat": obj.lat, "long": obj.long, "geocode": obj.geocode}

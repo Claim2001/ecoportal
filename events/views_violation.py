@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from drf_yasg import openapi
 
 from events.models import ViolationModel, ViolationImageModel
-from events.serializers import ViolationCreateSerializer, ViolationRetrieveSerializer, \
+from events.serializers_violation import ViolationCreateSerializer, ViolationRetrieveSerializer, \
     ViolationListSerializer, ViolationUpdateDeleteSerializer
 
 
