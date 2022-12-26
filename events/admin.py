@@ -15,7 +15,7 @@ class ViolationImageAdmin(admin.ModelAdmin):
 
 @admin.register(RecycleModel)
 class RecycleAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'geocode', 'lat', 'long', 'get_working_days_display']
+    list_display = ['id', 'name', 'geocode', 'lat', 'long', 'get_working_days_display', 'opening', 'closing']
 
 
 @admin.register(RecycleImageModel)

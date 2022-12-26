@@ -1,3 +1,5 @@
+from django.http import Http404
+from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, permissions
 from rest_framework.generics import GenericAPIView, UpdateAPIView, DestroyAPIView, RetrieveAPIView, \
@@ -18,10 +20,10 @@ class ViolationCreateView(GenericAPIView):
                                     400: openapi.Response(description="Lat/long/geocode not in location")})
     def post(self, request, *args, **kwargs):
         """
-            Registration API
+            Create Violation
                 Body: {"images": FILE(type of image, 1 or more), "title": int(1, 2 or 3), "comment": string,
                 "location":{"lat": float, "long": float, "geocode": string}}
-                Titles: 1 - Illegal Dump, 2 - Deforestation, 3 - Water Pollution
+                Titles: 1 - Illegal Dump(Свалка), 2 - Deforestation(Вырубка), 3 - Water Pollution(Загрязнение вод)
                 Responses: 201 - {"message": "Violation is created"}
                             400 - {"message": "Lat/long/geocode not in location"}
         """
@@ -65,7 +67,7 @@ class ViolationUpdateDeleteView(UpdateAPIView, DestroyAPIView):
     """
         Update/Delete violation
             Can be performed only by author or superuser
-            For update better use PATCH method(no need for sending all data in body, only changed one):
+            For update better use PATCH method(no need for sending all data in body, only the changed one):
                 Body: {"title":int,"comment":string,"location":{"lat":float,"long":float,"geocode":string},
                 "deleted_images":[int,int,int,...],"new_images":[FILE(image type),FILE(image type),...]}
                 Titles: 1 - Illegal Dump, 2 - Deforestation, 3 - Water Pollution
@@ -79,7 +81,8 @@ class ViolationUpdateDeleteView(UpdateAPIView, DestroyAPIView):
     queryset = ViolationModel.objects.all()
     lookup_url_kwarg = 'id'
 
-    def update(self, request, *args, **kwargs):
-        if self.request.user != self.get_object().author and not self.request.user.is_superuser:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        return super(ViolationUpdateDeleteView, self).update(request, *args, **kwargs)
+    def get_object(self):
+        obj = get_object_or_404(ViolationModel, id=self.kwargs['id'])
+        if self.request.user != obj.author and not self.request.user.is_superuser:
+            raise Http404
+        return obj

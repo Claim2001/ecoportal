@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from events.models import ViolationModel, ViolationImageModel, TITLES
+from events.utils import check_location, update_location
 
 
 class AuthorSerializer(serializers.ModelSerializer):
@@ -19,14 +20,7 @@ class ViolationCreateSerializer(serializers.Serializer):
     comment = serializers.CharField()
 
     def validate(self, attrs):
-        if attrs['location'].keys() != {"geocode", "long", "lat"}:
-            raise serializers.ValidationError(detail={"message": "Lat/long/geocode not in location"})
-        if not isinstance(attrs['location']['lat'], (float, int)):
-            raise serializers.ValidationError(detail={"message": "Lat is not float or int"})
-        if not isinstance(attrs['location']['long'], (float, int)):
-            raise serializers.ValidationError(detail={"message": "Long is not float or int"})
-        if not isinstance(attrs['location']['geocode'], str):
-            raise serializers.ValidationError(detail={"message": "Geocode is not string"})
+        check_location(attrs['location'])
         return attrs
 
 
@@ -78,6 +72,11 @@ class ViolationUpdateDeleteSerializer(serializers.ModelSerializer):
                                                         queryset=ViolationImageModel.objects.all())
     images = ViolationImageSerializer(many=True, source='image')
 
+    def validate(self, attrs):
+        if 'location' in attrs:
+            update_location(attrs['location'])
+        return attrs
+
     def update(self, instance, validated_data):
         if 'new_images' in validated_data:
             new_images = validated_data.pop('new_images')
@@ -107,7 +106,6 @@ class ViolationUpdateDeleteSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super(ViolationUpdateDeleteSerializer, self).to_representation(instance)
         data['location'] = {"lat": instance.lat, "long": instance.long, "geocode": instance.geocode}
-        user = self.context['request'].user
         data['title'] = instance.get_title_display()
         return data
 
