@@ -30,6 +30,19 @@ WORKING_DAYS = (
     (7, _("Sunday")),
 )
 
+PAYMENT_METHODS = (
+    (1, _("Plastic card")),
+    (2, _("Cash")),
+    (3, _("App")),
+)
+
+CHARGING_TYPES = (
+    (1, _("Slow")),
+    (1, _("Fast")),
+    (1, _("Rapid")),
+    (1, _("Extra Fast")),
+)
+
 
 class ViolationModel(BaseModel, LocationModel, models.Model):
     title = models.CharField(choices=TITLES, max_length=20)
@@ -61,3 +74,20 @@ class RecycleModel(BaseModel, LocationModel, models.Model):
 class RecycleImageModel(BaseModel, models.Model):
     image = models.ImageField(upload_to='recycles')
     recycle = models.ForeignKey(RecycleModel, on_delete=models.CASCADE, related_name='image')
+
+
+class ChargingStationModel(BaseModel, LocationModel, models.Model):
+    title = models.CharField(max_length=255)
+    price = models.FloatField()
+    payment_method = MultiSelectField(choices=PAYMENT_METHODS, max_choices=3, max_length=20)
+    charging_type = models.CharField(choices=CHARGING_TYPES, max_length=20)
+    description = models.TextField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title + ' - ' + self.geocode
+
+
+class ChargingStationImageModel(BaseModel, models.Model):
+    image = models.ImageField(upload_to='charging stations')
+    station = models.ForeignKey(ChargingStationModel, on_delete=models.CASCADE, related_name='image')
