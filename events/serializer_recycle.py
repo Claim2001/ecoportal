@@ -1,13 +1,7 @@
-import datetime
-import operator
+from rest_framework import serializers
 
-from django.contrib.auth.models import User
-from rest_framework import serializers, fields
-from functools import reduce
 from events.models import RecycleModel, RecycleImageModel, WORKING_DAYS, RECYCLE_TYPES
 from events.serializers_violation import AuthorSerializer
-from django.db.models import Q
-
 from events.utils import check_location, update_location, update_working_hours
 
 
@@ -25,9 +19,11 @@ class RecycleCreateSerializer(serializers.ModelSerializer):
     working_hours = serializers.JSONField(required=True, write_only=True)
 
     def validate(self, attrs):
-        if not attrs['recycle_types']:
+        if 'recycle_types' not in attrs or not attrs['recycle_types']:
             raise serializers.ValidationError(detail={"message": "Recycle types not in data"})
-        if not attrs['working_days']:
+        if 'working_days' not in attrs or not attrs['working_days']:
+            raise serializers.ValidationError(detail={"message": "Working days not in data"})
+        if 'working_hours' not in attrs or not attrs['working_hours']:
             raise serializers.ValidationError(detail={"message": "Working days not in data"})
         check_location(attrs['location'])
         update_working_hours(attrs['working_hours'])
